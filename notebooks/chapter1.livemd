@@ -1,17 +1,50 @@
-# One max algorithm implemantation
+# Genetic algorithms in Elixir - Chapter 1
 
+## The One Max problem
+
+A basic introduction to genetic algorithms can be had by working through the solution of the
+one max problem. The problem to be solved is to find the largest binary number that can be 
+represented with a binary string, e.g for a string of length 4, the solution is 1111.
+
+## Overview
+
+The general set of steps to solve a problem using genetic algorithms is as follows:
+
+1. Generate an initial population of solutions
+2. Evaluate the solutions (chromosomes) and sort the population accordingly
+3. Pair up the adjacent solutions as parents
+4. Create a new set of solutions by combining each set of parent solutions
+5. Randomly alter a small subset of your population to avoid premature convergence (mutation)
+
+## Example implementation
+
+Step 1: Generating the initial population
+
+```elixir
 init_population = for _ <- 1..100, do: for(_ <- 1..1000, do: Enum.random(0..1))
+```
 
+Step 2: Evaluate the population and sort accordingly
+
+```elixir
 evaluate = fn population ->
   Enum.sort_by(population, &Enum.sum/1, &>=/2)
 end
+```
 
+Step 3: Select parents
+
+```elixir
 selection = fn population ->
   population
   |> Enum.chunk_every(2)
   |> Enum.map(&List.to_tuple(&1))
 end
+```
 
+Step 4: Combine parents' solutions to form new child solutions
+
+```elixir
 crossover = fn population ->
   Enum.reduce(population, [], fn {p1, p2}, acc ->
     cx_point = :rand.uniform(1000)
@@ -19,7 +52,11 @@ crossover = fn population ->
     [h1 ++ t2, h2 ++ t1 | acc]
   end)
 end
+```
 
+Step 5: Mutate a small portion of the population
+
+```elixir
 mutation = fn population ->
   population
   |> Enum.map(fn chromosome ->
@@ -30,7 +67,11 @@ mutation = fn population ->
     end
   end)
 end
+```
 
+Put it all together:
+
+```elixir
 algorithm = fn population, algorithm ->
   # IO.inspect(population)
   best = Enum.max_by(population, &Enum.sum/1)
@@ -54,5 +95,6 @@ algorithm = fn population, algorithm ->
 end
 
 solution = algorithm.(init_population, algorithm)
-IO.write("\n Answer is \n")
-IO.inspect(solution)
+# IO.write("\n Answer is \n")
+# IO.inspect(solution)
+```
