@@ -23,3 +23,5 @@ erl_crash.dump
 genetic_algorithms_elixir-*.tar
 
 .elixir_ls
+
+.elixir_ls/*
